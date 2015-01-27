@@ -16,7 +16,7 @@ import android.net.Uri;
  */
 public class Proveedor extends ContentProvider {
     private Ayudante abd;
-    static String AUTORIDAD = "paquete.proveedor";
+    static String AUTORIDAD = "com.izv.inmoviliariacv.proveedor";
     private static final UriMatcher convierteUri2Int;
     private static final int INMUEBLES = 1;
     private static final int INMUEBLE_ID = 0;
