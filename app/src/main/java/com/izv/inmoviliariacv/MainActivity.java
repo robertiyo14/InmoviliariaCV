@@ -57,7 +57,6 @@ public class MainActivity extends Activity {
             String precio;
             long index=0;
             Inmueble i;
-            in.open();
             switch (requestCode){
                 case CREAR:
                     //Hago cosas
@@ -120,13 +119,14 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.principal);
         in = new Inmobiliaria(this);
+        Cursor c = in.query();
+        ad = new Adaptador(this,c);
         lv=(ListView)findViewById(R.id.lvLista);
+        lv.setAdapter(ad);
         registerForContextMenu(lv);
         final ListView lv = (ListView)findViewById(R.id.lvLista);
         final FragmentoDetalle fd = (FragmentoDetalle)getFragmentManager().findFragmentById(R.id.fragment3);
         posActual = 0;
-
-
         final boolean horizontal = fd!=null && fd.isInLayout();
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> av, View v,int pos, long id) {
@@ -190,21 +190,6 @@ public class MainActivity extends Activity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        in.open();
-        Cursor c = in.getCursor(null, null, null);
-        ad = new Adaptador(this, c);
-        lv.setAdapter(ad);
-        //datosPrueba();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        in.close();
-    }
 
     public void datosPrueba(){
         String[] direcciones = {"Dir 1","Dir 2","Dir 3"};
@@ -213,9 +198,9 @@ public class MainActivity extends Activity {
         String[] precios = {"60000.50","55000.00","100000.30"};
         for (int i = 0; i < direcciones.length; i++) {
             Inmueble inmueble = new Inmueble(direcciones[i],tipos[i],localidades[i],precios[i]);
-            Long id = in.insert(inmueble);
+            in.insert(inmueble);
         }
-        Cursor c = in.getCursor(null,null,null);
+        Cursor c = in.query();
         ad.changeCursor(c);
     }
 
@@ -257,8 +242,7 @@ public class MainActivity extends Activity {
         Inmueble i = al.get(index);
         if(id==R.id.action_borrar){
             in.delete(i);
-            Cursor c = in.getCursor(null,null,null);
-            ad.changeCursor(c);
+            actualizarLista();
         }else if(id==R.id.action_modificar){
             Intent intent = new Intent(this,Anadir.class);
             Bundle b = new Bundle();
@@ -275,7 +259,7 @@ public class MainActivity extends Activity {
     }
 
     public void actualizarLista(){
-        Cursor c = in.getCursor(null,null,null);
+        Cursor c = in.query();
         ad.changeCursor(c);
     }
 

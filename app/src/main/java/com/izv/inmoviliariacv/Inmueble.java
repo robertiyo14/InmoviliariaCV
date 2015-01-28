@@ -12,7 +12,7 @@ public class Inmueble implements Serializable, Comparable<Inmueble> {
     private long id;
     private double precio;
     private String localidad, direccion, tipo;
-    private boolean subido;
+    private int subido;
 
     /***************CONSTRUCTORES*******************/
 
@@ -26,7 +26,7 @@ public class Inmueble implements Serializable, Comparable<Inmueble> {
         this.direccion = direccion;
         this.tipo = tipo;
         this.precio = precio;
-        this.subido = false;
+        this.subido = 0;
     }
 
     public Inmueble(String localidad, String direccion, String tipo, String precio){
@@ -38,7 +38,7 @@ public class Inmueble implements Serializable, Comparable<Inmueble> {
         }catch (NumberFormatException e){
             this.precio = 0;
         }
-        this.subido = false;
+        this.subido = 0;
     }
 
 
@@ -84,11 +84,11 @@ public class Inmueble implements Serializable, Comparable<Inmueble> {
         this.tipo = tipo;
     }
 
-    public boolean isSubido() {
+    public int isSubido() {
         return subido;
     }
 
-    public void setSubido(boolean subido) {
+    public void setSubido(int subido) {
         this.subido = subido;
     }
 

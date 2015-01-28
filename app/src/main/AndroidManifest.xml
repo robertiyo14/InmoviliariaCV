@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme" >
         <provider
             android:name="com.izv.inmoviliariacv.Proveedor"
-            android:authorities="com.izv.inmobiliariacv.proveedor"
+            android:authorities="com.izv.inmoviliariacv.proveedor"
             android:enabled="true"
             android:exported="true" >
         </provider>

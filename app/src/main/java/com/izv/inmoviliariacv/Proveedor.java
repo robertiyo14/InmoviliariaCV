@@ -9,6 +9,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.util.Log;
 
 
 /**
@@ -16,10 +17,10 @@ import android.net.Uri;
  */
 public class Proveedor extends ContentProvider {
     private Ayudante abd;
-    static String AUTORIDAD = "com.izv.inmoviliariacv.proveedor";
+    public static String AUTORIDAD = "com.izv.inmoviliariacv.proveedor";
     private static final UriMatcher convierteUri2Int;
     private static final int INMUEBLES = 1;
-    private static final int INMUEBLE_ID = 0;
+    private static final int INMUEBLE_ID = 2;
 
     static {
         convierteUri2Int = new UriMatcher(UriMatcher.NO_MATCH);
@@ -27,33 +28,30 @@ public class Proveedor extends ContentProvider {
         convierteUri2Int.addURI(AUTORIDAD, Contrato.TablaInmueble.TABLA + "/#", INMUEBLE_ID);
     }
 
-    @Override
-    public boolean onCreate() {
-        abd = new Ayudante(getContext());
-        return false;
-    }
+    public Proveedor(){}
 
     @Override
-    public Cursor query(Uri uri, String[] proyeccion, String condicion, String[] parametros, String orderBy) {
-        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
-        qb.setTables(Contrato.TablaInmueble.TABLA);
+    public int delete(Uri uri, String condicion, String[] parametros) {
+        SQLiteDatabase db = abd.getWritableDatabase();
         switch (convierteUri2Int.match(uri)) {
             case INMUEBLES:
                 break;
-            default:
-                throw new IllegalArgumentException("URI " + uri);
+            case INMUEBLE_ID:
+                condicion = Contrato.TablaInmueble._ID+" = ?";
+                parametros = new String[]{uri.getLastPathSegment()};
+                break;
+            default: throw new IllegalArgumentException("URI " + uri);
         }
-        SQLiteDatabase db = abd.getReadableDatabase();
-        Cursor c = qb.query(db, proyeccion, condicion, parametros, null, null, orderBy);
-        c.setNotificationUri(getContext().getContentResolver(), uri);
-        return c;
+        int cuenta = db.delete(Contrato.TablaInmueble.TABLA, condicion, parametros);
+        getContext().getContentResolver().notifyChange(uri, null);
+        return cuenta;
     }
 
     @Override
     public String getType(Uri uri) {
         switch (convierteUri2Int.match(uri)) {
             case INMUEBLES:
-                return Contrato.TablaInmueble.CONTENT_TYPE;
+                return Contrato.TablaInmueble.CONTENT_TYPE_INMUEBLES;
             default:
                 throw new IllegalArgumentException("URI " + uri);
         }
@@ -72,23 +70,20 @@ public class Proveedor extends ContentProvider {
             return uriElemento;
         }
         throw new SQLException("Insert" + uri);
-
     }
 
     @Override
-    public int delete(Uri uri, String condicion, String[] parametros) {
-        SQLiteDatabase db = abd.getWritableDatabase();
-        switch (convierteUri2Int.match(uri)) {
-            case INMUEBLES:
-                break;
-            case INMUEBLE_ID:
-                condicion = condicion + "_id = " + uri.getLastPathSegment();
-                break;
-            default: throw new IllegalArgumentException("URI " + uri);
-        }
-        int cuenta = db.delete(Contrato.TablaInmueble.TABLA, condicion, parametros);
-        getContext().getContentResolver().notifyChange(uri, null);
-        return cuenta;
+    public boolean onCreate() {
+        abd = new Ayudante(getContext());
+        Log.v("AAAAAAAAAAAAAAAAAAAAAAA","adb creado");
+        return true;
+    }
+
+    @Override
+    public Cursor query(Uri uri, String[] proyeccion, String condicion, String[] parametros, String orderBy) {
+        SQLiteDatabase db = abd.getReadableDatabase();
+        Cursor cursor = db.query(Contrato.TablaInmueble.TABLA,proyeccion,condicion,parametros,null,null,orderBy);
+        return cursor;
     }
 
     @Override
@@ -96,15 +91,17 @@ public class Proveedor extends ContentProvider {
         SQLiteDatabase db = abd.getWritableDatabase();
         int cuenta;
         switch (convierteUri2Int.match(uri)) {
+            case INMUEBLE_ID:
+                condicion = Contrato.TablaInmueble._ID + " = ?";
+                parametros = new String[]{uri.getLastPathSegment()};
             case INMUEBLES:
-                cuenta = db.update(Contrato.TablaInmueble.TABLA, valores, condicion, parametros);
                 break;
             default:
                 throw new IllegalArgumentException("URI " + uri);
         }
+        cuenta = db.update(Contrato.TablaInmueble.TABLA,valores,condicion,parametros);
         getContext().getContentResolver().notifyChange(uri, null);
         return cuenta;
-
     }
 }
 
