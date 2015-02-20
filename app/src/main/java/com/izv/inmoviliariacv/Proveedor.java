@@ -75,15 +75,36 @@ public class Proveedor extends ContentProvider {
     @Override
     public boolean onCreate() {
         abd = new Ayudante(getContext());
-        Log.v("AAAAAAAAAAAAAAAAAAAAAAA","adb creado");
         return true;
     }
 
     @Override
     public Cursor query(Uri uri, String[] proyeccion, String condicion, String[] parametros, String orderBy) {
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(Contrato.TablaInmueble.TABLA);
+        switch (convierteUri2Int.match(uri)) {
+            case INMUEBLES: break;
+            default:
+                throw new IllegalArgumentException("URI " + uri);
+        }
         SQLiteDatabase db = abd.getReadableDatabase();
-        Cursor cursor = db.query(Contrato.TablaInmueble.TABLA,proyeccion,condicion,parametros,null,null,orderBy);
-        return cursor;
+        Cursor c = qb.query(db, proyeccion, condicion,parametros, null, null, orderBy);
+        return c;
+    }
+
+    public Cursor queryDos(Uri uri, String[] proyeccion, String condicion,String[] parametros, String orderBy){
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(Contrato.TablaInmueble.TABLA);
+        switch (convierteUri2Int.match(uri)) {
+            case INMUEBLES: break;
+            default:
+                throw new IllegalArgumentException("URI " + uri);
+        }
+        SQLiteDatabase db = abd.getReadableDatabase();
+        Cursor c = qb.query(db, proyeccion, condicion,
+                parametros, null, null, orderBy);
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
     }
 
     @Override

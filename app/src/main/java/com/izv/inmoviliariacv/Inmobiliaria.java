@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,28 @@ public class Inmobiliaria {
         String orden = null;
         Cursor c = context.getContentResolver().query(uri, proyeccion, condicion, parametros, orden);
         return c;
+    }
+
+    public ArrayList<Inmueble> query(String cond){
+        Uri uri = Contrato.TablaInmueble.CONTENT_URI;
+        String[] proyeccion = null;
+        String[] parametros = null;
+        String orden = null;
+        Cursor c = context.getContentResolver().query(uri, proyeccion, cond, parametros, orden);
+        c.moveToFirst();
+        ArrayList in = new ArrayList();
+        while (c.isAfterLast()){
+            Log.v("BBBBBBBBBBBB","Entro en cursor");
+            Inmueble objeto = new Inmueble();
+            objeto.setId(c.getInt(0));
+            objeto.setLocalidad(c.getString(1));
+            objeto.setDireccion(c.getString(2));
+            objeto.setTipo(c.getString(3));
+            objeto.setPrecio(c.getDouble(4));
+            objeto.setSubido(c.getInt(5));
+            in.add(objeto);
+        }
+        return in;
     }
 
     //getRow(Cursor c)
